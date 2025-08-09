@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 from transformers import CLIPProcessor, CLIPModel
 
 # Load from .env or set directly
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "API KEY"
 os.environ["OPENAI_API_BASE"] = "https://api.groq.com/openai/v1"
 
 
@@ -225,5 +225,6 @@ if __name__ == "__main__":
         print(f"Answer: {answer}")
         print("=" * 70) 
  
+
 
   
