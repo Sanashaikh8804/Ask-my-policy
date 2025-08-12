@@ -223,7 +223,7 @@ if __name__ == "__main__":
         print("-" * 50)
         answer = multimodal_pdf_rag_pipeline(query)
         print(f"Answer: {answer}")
-        print("=" * 70) 
+        print("=" * 70)
  
 
 

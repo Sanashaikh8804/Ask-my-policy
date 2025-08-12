@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        :root{
+            --background: #fffffe;
+            --headline: #094067;
+            --para: #5f6c7b;
+            --Button: #3da9fc;
+            --Button-text: #fffffe;
+            --Stroke: #094067;
+            --Main: #fffffe;
+            --Highlight: #3da9fc;
+            --Secondary: #90b4ce;
+            --Tertiary: #ef4565;
+
+            /* For blue background */
+            --Blue-Bg: #d8eefe;
+            --Headline: #094067;
+            --Sub-headline: #5f6c7b;
+            --Card-background: #fffffe;
+            --Card-heading: #094067;
+            --Card-paragraph: #5f6c7b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--Blue-Bg);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chatbot-slide {
+            width: 400px;
+            height: 600px;
+            background: var(--Card-background);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(9, 64, 103, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--Stroke);
+        }
+
+        #close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            color: var(--Tertiary);
+        }
+
+        #close:hover {
+            background-color: var(--Blue-Bg);
+        }
+
+        .chat-header {
+            background: var(--headline);
+            color: var(--Button-text);
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: var(--background);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .user-message {
+            background: var(--Button);
+            color: var(--Button-text);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: var(--Blue-Bg);
+            color: var(--Card-paragraph);
+            align-self: flex-start;
+            border: 1px solid var(--Secondary);
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        #chatbotform {
+            background: var(--Card-background);
+            padding: 20px;
+            border-top: 1px solid var(--Secondary);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--Card-heading);
+            font-size: 14px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--Secondary);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--background);
+            transition: border-color 0.2s;
+            color: var(--para);
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--Button);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #search {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--Secondary);
+            border-radius: 25px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: var(--background);
+            color: var(--para);
+        }
+
+        #search:focus {
+            outline: none;
+            border-color: var(--Button);
+        }
+
+        #search::placeholder {
+            color: var(--Sub-headline);
+        }
+
+        #chatbotSubmit {
+            background: var(--Button);
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #chatbotSubmit:hover {
+            transform: scale(1.05);
+            background: var(--headline);
+        }
+
+        .policy-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .policy-container select {
+            flex: 1;
+        }
+
+        .pdf-icon {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            color: var(--Tertiary);
+        }
+
+        .pdf-icon:hover {
+            opacity: 1;
+            color: var(--Button);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: var(--Blue-Bg);
+            border-radius: 18px;
+            max-width: 80px;
+            align-self: flex-start;
+            border: 1px solid var(--Secondary);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--para);
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--Blue-Bg);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--Secondary);
+            border-radius: 2px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--Button);
+        }
+
+        /* Option groups styling */
+        optgroup {
+            color: var(--Card-heading);
+            font-weight: 500;
+        }
+
+        option {
+            color: var(--para);
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-slide">
+        <button id="close">
+            <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="chat-header">
+            Insurance Assistant
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div>Hello! I'm here to help you with your insurance queries. Please select your domain and policy, then ask me anything!</div>
+                <div class="message-time" id="botTime"></div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <form id="chatbotform" action="/submitChatbot" method="POST">
+            <div class="form-group">
+                <label>Domain</label>
+                <select name="domain">
+                    <option value="">Select</option>
+                    <option value="health">Health</option>
+                    <optgroup>
+                        <option value="personal">Personal</option>
+                        <option value="family">Family</option>
+                    </optgroup>
+                    <option value="vehicle">Vehicle</option>
+                    <optgroup>
+                        <option value="car">Car</option>
+                        <option value="bike">Bike</option>
+                    </optgroup>
+                    <option value="travel">Travel</option>
+                    <optgroup>
+                        <option value="international">International</option>
+                        <option value="domestic">Domestic</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Policy</label>
+                <div class="policy-container">
+                    <select name="policy">
+                        <option value="">Select</option>
+                        <option value="maharashtra darshan">Maharashtra Darshan</option>
+                        <option value="kerala diaries">kerala diaries</option>
+                        <option value="europe dream">Europe Dream</option>
+                        <option value="australian open">Australian Open</option>
+                        <option value="Tuzya khatir">Tuzya Khatir(goa)</option>
+                        <option value="meri family">Meri family</option>
+                        <option value="hum sath hai">hum sath hai</option>
+                        <option value="Apni car">Apni car</option>
+                        <option value="meri car">meri car</option>
+                        <option value="rider assure">rider assure</option>
+                        <option value="roadies">roadies</option>
+                    </select>
+                    <svg class="pdf-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-container">
+                    <input type="text" name="search" id="search" placeholder="Ask your question here..."> 
+                    <button type="submit" id="chatbotSubmit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Bot responses based on different scenarios
+        const botResponses = {
+            health: [
+                "Great choice! Health insurance is essential for your wellbeing. What specific health coverage are you looking for?",
+                "I can help you understand your health insurance benefits. What would you like to know about your policy?",
+                "Health insurance can cover medical expenses, prescriptions, and preventive care. How can I assist you today?"
+            ],
+            vehicle: [
+                "Vehicle insurance protects you on the road. Whether it's comprehensive or third-party, I'm here to help!",
+                "Car or bike insurance queries? I've got you covered! What would you like to know?",
+                "Vehicle insurance is mandatory and important. Let me help you understand your policy better."
+            ],
+            travel: [
+                "Travel insurance ensures peace of mind during your journeys. Planning a domestic or international trip?",
+                "Travel insurance can cover trip cancellations, medical emergencies abroad, and lost luggage. How can I help?",
+                "Whether you're exploring Kerala or dreaming of Europe, travel insurance is essential. What's your question?"
+            ],
+            general: [
+                "I'm here to help with all your insurance queries! Could you provide more details about what you're looking for?",
+                "Thanks for your question! Based on your selected domain and policy, how can I assist you further?",
+                "I understand you have an insurance question. Let me help you find the right information!",
+                "That's an interesting question! Let me provide you with the most relevant information for your policy.",
+                "I'm analyzing your query in context of your selected insurance options. Here's what I can tell you:",
+                "Great question! Insurance can be complex, but I'm here to make it simple for you."
+            ],
+            claim: [
+                "For claim-related queries, I'll need some basic information. Have you already filed a claim or are you looking to file one?",
+                "Claim processing typically takes 7-15 business days. What specific aspect of the claim would you like to know about?",
+                "I can help you with claim procedures, required documents, and status updates. What do you need assistance with?"
+            ],
+            premium: [
+                "Premium calculations depend on various factors like age, coverage amount, and policy type. What would you like to know?",
+                "Your premium can be paid monthly, quarterly, or annually. Would you like information about payment options?",
+                "Premium discounts may be available for early payments or no-claim bonuses. Shall I explain the details?"
+            ]
+        };
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatForm = document.getElementById('chatbotform');
+        const searchInput = document.getElementById('search');
+        const domainSelect = document.querySelector('select[name="domain"]');
+        const policySelect = document.querySelector('select[name="policy"]');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Initialize bot time
+        document.getElementById('botTime').textContent = getCurrentTime();
+
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.textContent = message;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = getCurrentTime();
+            
+            messageDiv.appendChild(messageContent);
+            messageDiv.appendChild(timeDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function getBotResponse(userMessage, domain, policy) {
+            const message = userMessage.toLowerCase();
+            
+            // Check for specific keywords
+            if (message.includes('claim') || message.includes('settlement')) {
+                return getRandomResponse(botResponses.claim);
+            }
+            if (message.includes('premium') || message.includes('payment') || message.includes('cost')) {
+                return getRandomResponse(botResponses.premium);
+            }
+            
+            // Domain-specific responses
+            if (domain) {
+                if (domain.includes('health') || domain === 'personal' || domain === 'family') {
+                    return getRandomResponse(botResponses.health);
+                }
+                if (domain.includes('vehicle') || domain === 'car' || domain === 'bike') {
+                    return getRandomResponse(botResponses.vehicle);
+                }
+                if (domain.includes('travel') || domain === 'international' || domain === 'domestic') {
+                    return getRandomResponse(botResponses.travel);
+                }
+            }
+            
+            // Policy-specific responses
+            if (policy) {
+                if (policy.includes('kerala') || policy.includes('maharashtra') || policy.includes('goa')) {
+                    return `Great choice with the ${policy} policy! This covers domestic travel within India. ${getRandomResponse(botResponses.travel)}`;
+                }
+                if (policy.includes('europe') || policy.includes('australian')) {
+                    return `The ${policy} policy covers international destinations. ${getRandomResponse(botResponses.travel)}`;
+                }
+                if (policy.includes('car') || policy.includes('rider')) {
+                    return `Your ${policy} policy provides excellent vehicle coverage. ${getRandomResponse(botResponses.vehicle)}`;
+                }
+                if (policy.includes('family')) {
+                    return `The ${policy} policy covers your entire family's health needs. ${getRandomResponse(botResponses.health)}`;
+                }
+            }
+            
+            return getRandomResponse(botResponses.general);
+        }
+
+        function getRandomResponse(responseArray) {
+            return responseArray[Math.floor(Math.random() * responseArray.length)];
+        }
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userMessage = searchInput.value.trim();
+            if (!userMessage) return;
+            
+            const selectedDomain = domainSelect.value;
+            const selectedPolicy = policySelect.value;
+            
+            // Add user message
+            addMessage(userMessage, true);
+            
+            // Clear input
+            searchInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate bot thinking time
+            setTimeout(() => {
+                hideTypingIndicator();
+                const botResponse = getBotResponse(userMessage, selectedDomain, selectedPolicy);
+                addMessage(botResponse, false);
+            }, Math.random() * 1000 + 1000); // Random delay between 1-2 seconds
+        });
+
+        // Close button functionality
+        document.getElementById('close').addEventListener('click', function() {
+            if (confirm('Are you sure you want to close the chat?')) {
+                document.querySelector('.chatbot-slide').style.transform = 'scale(0)';
+                setTimeout(() => {
+                    document.querySelector('.chatbot-slide').style.display = 'none';
+                }, 300);
+            }
+        });
+
+        // Auto-focus on input
+        searchInput.focus();
+
+        // Handle Enter key in input
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
